@@ -1,0 +1,122 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:TruthTable.View"
+             xmlns:converters="clr-namespace:TruthTable.Converters"
+             xmlns:controls="clr-namespace:TruthTable.OtherControls"
+             xmlns:viewmodel="clr-namespace:TruthTable.ViewModel"
+             d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
+             x:Name="userControl"
+             x:Class="TruthTable.View.InputConsole"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             Background="White">
+    <!--Импорт конверторов-->
+    <UserControl.Resources>
+        <converters:MarginConvertor x:Key="MarginConvertor" />
+    </UserControl.Resources>
+
+    <Grid x:Name="mainGrid"
+          Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="1*"
+                           Name="buttonRow" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <!--сделать так, что при нажатии на кнопки фокус возвращается в поле ввода-->
+        <!--Поле ввода-->
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2">
+            <TextBlock Text="Введите логическую функцию"
+                       Style="{StaticResource ResourceKey=InputConsoleText}"
+                       FontSize="16pt" />
+            <!--при нажатии на кнопку клавиатуры, каретка становится в положение 0, нужно поправить это
+            реализовать можно через наблюдение за фокусом
+            чтобы реализовать наблюдение за фокусом, нужно создать еще одно свойство зависимостей...-->
+            <controls:ExtendedTextBox Height="30"
+                                           Text="{Binding Path=InputExpression, Mode=TwoWay}"
+                                           CaretPosition="{Binding CursorPosition}"
+                                           Style="{StaticResource InputFunction}" 
+                                           IsFocusedExtended="{Binding IsFocused}"/>
+            <Border BorderThickness="0, 0, 0, 2"
+                    BorderBrush="Black" />
+        </StackPanel>
+
+        <!--Клавиатура-->
+        <UniformGrid Grid.Row="1"
+                     Grid.Column="0"
+                     Rows="4"
+                     Columns="4">
+            <Button Content="∨"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="∧"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="&#x00AC;"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="→"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="↔"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="↓"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="↑"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="⊕"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="("
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content=")"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="0"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="1"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="x1"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="x2"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="x3"
+                    Style="{StaticResource KeyboardButton}" />
+            <Button Content="x4"
+                    Style="{StaticResource KeyboardButton}" />
+
+        </UniformGrid>
+
+        <!--выбор необходимых действий с логической функцией-->
+        <StackPanel Grid.Row="1"
+                    Grid.Column="1">
+            <CheckBox x:Name="TruthTable"
+                      Content="Таблица истинности"
+                      IsThreeState="False"
+                      IsChecked="{Binding IsBuildValueTable, Mode=OneWayToSource}" />
+        </StackPanel>
+        <!--Кнопки запуска и очистки ввода-->
+        <!--нужно создать конвертор и вставить его сюда-->
+        <UniformGrid  Grid.Row="2"
+                      Grid.ColumnSpan="2"
+                      Rows="1"
+                      Columns="2">
+            <UniformGrid.Margin>
+                <Binding Converter="{StaticResource MarginConvertor}"
+                         ConverterParameter="0,1;0,1;-1;2"
+                         RelativeSource="{RelativeSource AncestorType={x:Type Grid}}" />
+
+            </UniformGrid.Margin>
+            <Button Content="Построить"
+                    Command="{Binding BuildFunction}"
+                    Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type UniformGrid}}, Converter={StaticResource MarginConvertor}, ConverterParameter='0,1;0,1;0;0'}" />
+            <Button Content="{Binding CursorPosition}"
+                    Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type UniformGrid}}, Converter={StaticResource MarginConvertor}, ConverterParameter='0,1;0,1;0;0'}" />
+        </UniformGrid>
+
+    </Grid>
+</UserControl>

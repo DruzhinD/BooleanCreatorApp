@@ -1,0 +1,41 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TruthTable.View"
+        xmlns:ViewModel="clr-namespace:TruthTable.ViewModel"
+        d:DataContext="{d:DesignInstance Type=ViewModel:MainWindowVM}"
+        x:Class="TruthTable.View.MainWindow"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="450"
+        Width="800"
+        MinWidth="800"
+        MinHeight="600">
+    <Window.DataContext>
+        <ViewModel:MainWindowVM />
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="2*" />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0"
+              Style="{StaticResource TextStyle}">
+            <MenuItem Header="Создать" />
+            <!--Диалоговое окно с созданием файла xlsx и
+            выбором частей программы, которые нужно вставить в файл-->
+            <Separator Width="10" />
+            <MenuItem Header="Справка" />
+            <!--Вызов диалогового окна, в котором отображается информация о программе-->
+        </Menu>
+        
+        <!--используют DataContext этого окна-->
+        <!--элемент ввода-->
+        <local:InputConsole Grid.Row="1" 
+                            x:Name="inputConsole"/>
+        <!--элемент вывода результата-->
+        <local:ResultPanel Grid.Row="2" />
+    </Grid>
+</Window>
