@@ -5,26 +5,22 @@ using System.Text.RegularExpressions;
 
 namespace TruthTable.Model
 {
-    public class LogicalFunction
+    public class LogicalFunction : LogicalFunctionBase
     {
-        string inFix;
-        public string InFix { get => inFix; }
+        public override string InFix { get => inFix; }
 
         string[] postFix;
 
-        //Список переменных отсортированных по алфавиту
-        public readonly string[] variables;
-
         //реализовать проверку
         public LogicalFunction(string expression)
+            : base(expression)
         {
-            inFix = expression;
             postFix = ToPostFix(expression);
-            variables = FindVariables();
+            variables = InitializeVariables();
         }
 
         //ищет переменные в выражении
-        private string[] FindVariables()
+        protected string[] InitializeVariables()
         {
             SortedSet<string> variables = new SortedSet<string>();
 
@@ -37,42 +33,6 @@ namespace TruthTable.Model
                 }
             }
             return variables.ToArray();
-        }
-
-        //приоритет операторов
-        private byte GetPriority(string op)
-        {
-            switch (op)
-            {
-                case "(":
-                    return 0;
-                case ")":
-                    return 0;
-                case "↓":
-                    return 1;
-                case "↑":
-                    return 1;
-                case "~":
-                    return 2;
-                case ">":
-                    return 3;
-                case "<":
-                    return 3;
-                case "+":
-                    return 4;
-                case "*":
-                    return 5;
-                case "!":
-                    return 6;
-                default:
-                    return 7;
-            }
-        }
-
-        //есть ли смысл в этом свойстве?
-        public string[] Operators
-        {
-            get => new string[] { "(", ")", "~", ">", "<", "+", "*", "!", "↓", "↑" };
         }
 
         //из инфиксной в постфиксную
@@ -140,26 +100,6 @@ namespace TruthTable.Model
 
             return postFix.ToArray();
         }
-        private bool IsOperator(string symb)
-        {
-            return Operators.Contains(symb);
-        }
-
-        #region Операции
-
-        private byte Disjunction(byte a, byte b) => Math.Max(a, b); //Дизъюнкция
-        private byte Conjunction(byte a, byte b) => Math.Min(a, b); //Конъюнкция
-        private byte Negation(byte a) => (byte)((a + 1) % 2); //Отрицание
-        private byte Implication(byte a, byte b) => Disjunction(Negation(a), b); //Конъюнкция
-        private byte Equivalence(byte a, byte b)  //Эквивалентность
-        {
-            if (a == b)
-                return 1;
-            return 0;
-        }
-        private byte PierArrow(byte a, byte b) => Negation(Disjunction(a, b));//стрелка пирса: НЕ ИЛИ
-        private byte SchaefferTouch(byte a, byte b) => Negation(Conjunction(a, b));//штрих шеффера: НЕ И
-        #endregion
 
         public byte FunctionValue(byte[] argsValues)
         {
