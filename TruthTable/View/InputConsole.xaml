@@ -43,10 +43,10 @@
             реализовать можно через наблюдение за фокусом
             чтобы реализовать наблюдение за фокусом, нужно создать еще одно свойство зависимостей...-->
             <controls:ExtendedTextBox Height="30"
-                                           Text="{Binding Path=InputExpression, Mode=TwoWay}"
-                                           CaretPosition="{Binding CursorPosition}"
-                                           Style="{StaticResource InputFunction}" 
-                                           IsFocusedExtended="{Binding IsFocused}"/>
+                                      Text="{Binding Path=InputExpression, Mode=TwoWay}"
+                                      CaretPosition="{Binding CursorPosition}"
+                                      Style="{StaticResource InputFunction}"
+                                      IsFocusedExtended="{Binding IsFocused}" />
             <Border BorderThickness="0, 0, 0, 2"
                     BorderBrush="Black" />
         </StackPanel>
@@ -98,6 +98,12 @@
                       Content="Таблица истинности"
                       IsThreeState="False"
                       IsChecked="{Binding IsBuildValueTable, Mode=OneWayToSource}" />
+            <CheckBox Content="Построить СДНФ"
+                      IsThreeState="False"
+                      IsChecked="{Binding IsBuildSdnf, Mode=OneWayToSource}" />
+            <CheckBox Content="Построить СКНФ"
+                      IsThreeState="False"
+                      IsChecked="{Binding IsBuildSknf, Mode=OneWayToSource}" />
         </StackPanel>
         <!--Кнопки запуска и очистки ввода-->
         <!--нужно создать конвертор и вставить его сюда-->
@@ -114,8 +120,8 @@
             <Button Content="Построить"
                     Command="{Binding BuildFunction}"
                     Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type UniformGrid}}, Converter={StaticResource MarginConvertor}, ConverterParameter='0,1;0,1;0;0'}" />
-            <Button Content="{Binding CursorPosition}"
-                    Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type UniformGrid}}, Converter={StaticResource MarginConvertor}, ConverterParameter='0,1;0,1;0;0'}" />
+            <!--<Button Content="{Binding CursorPosition}"
+                    Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type UniformGrid}}, Converter={StaticResource MarginConvertor}, ConverterParameter='0,1;0,1;0;0'}" />-->
         </UniformGrid>
 
     </Grid>

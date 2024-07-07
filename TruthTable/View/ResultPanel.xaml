@@ -28,7 +28,13 @@
                   HorizontalAlignment="Left"
                   VerticalAlignment="Top"
                   CanUserSortColumns="False" />
-
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Left">
+            <TextBlock Text="{Binding SdnfExpression}"
+                       Style="{StaticResource InputConsoleText}" />
+            <TextBlock Text="{Binding SknfExpression}"
+                       Style="{StaticResource InputConsoleText}"/>
+        </StackPanel>
 
     </Grid>
 </UserControl>

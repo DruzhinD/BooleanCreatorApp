@@ -64,6 +64,10 @@
     </Compile>
     <Compile Include="Converters\ConvertorBase.cs" />
     <Compile Include="Converters\MarginConvertor.cs" />
+    <Compile Include="Model\LogicalFunctionBase.cs" />
+    <Compile Include="Model\NormalForms\INormalizationForm.cs" />
+    <Compile Include="Model\NormalForms\SDNF.cs" />
+    <Compile Include="Model\NormalForms\SKNF.cs" />
     <Compile Include="OtherControls\ExtendedTextBox.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />

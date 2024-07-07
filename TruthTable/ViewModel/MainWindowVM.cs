@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using TruthTable.Model;
+using TruthTable.Model.NormalForms;
 
 namespace TruthTable.ViewModel
 {
@@ -39,21 +40,45 @@ namespace TruthTable.ViewModel
             {
                 return buildFunction ?? (buildFunction = new RelayCommand(obj =>
                 {
+                    (string expression, bool isVector) = CheckAndRewriteExpression();
+
                     //задаем таблицу значений функции
-                    valueTable = new ValueTable(
-                        new LogicalFunction(CheckAndRewriteExpression())
-                        );
+                    if (isVector)
+                        valueTable = new ValueTable(expression);
+                    else
+                        valueTable = new ValueTable(
+                            new LogicalFunction(expression));
                     //Вызываем метод заполнения DataTable и отображаем datagrid
                     if (IsBuildValueTable)
                     {
                         FillDataGridValueTable();
                         DataGridVisibility = Visibility.Visible;
                     }
+
+                    //построение сднф
+                    if (IsBuildSdnf)
+                    {
+                        valueTable.LogicNormalForm = new SDNF();
+                        //нужно вынести слово СДНФ в отдельный блок
+                        SdnfExpression = "СДНФ:\t" + valueTable.GetNormalForm();
+                    }
+
+                    //построение скнф
+                    if (IsBuildSknf)
+                    {
+                        //...
+                        valueTable.LogicNormalForm = new SKNF();
+                        SknfExpression = "СКНФ:\t" + valueTable.GetNormalForm();
+                    }
                 }));
             } }
 
-        //проверка корректности введенной функции и замена операторов на те, что обрабатывает LogicalExpression
-        private string CheckAndRewriteExpression()
+        ///<summary>
+        /// проверка корректности введенной функции и замена операторов на те, что обрабатывает LogicalExpression
+        /// </summary>
+        /// <returns>string: функция/вектор-функция <br/> bool: true - вектор-функция; false - обычная функция</returns>
+        /// <exception cref="ArgumentException"></exception>
+        private (string, bool) CheckAndRewriteExpression()
         {
             //копируем введенное выражение
             StringBuilder expression = new StringBuilder(inputExpression);
@@ -73,10 +98,43 @@ namespace TruthTable.ViewModel
                 expression = expression.Replace(replace.Item1.ToString(), replace.Item2.ToString());
 
             //проверка корректного ввода
-            //some
+            //проверка на соответствие вектор-функции
+            bool isVector = true;
+            for (int i = 0; i < expression.Length; i++)
+                if (!char.IsDigit(expression[i])) isVector = false;
 
-            return expression.ToString();
+            //работаем с вектор функцией
+            if (isVector)
+            {
+                if ((int)Math.Sqrt(expression.Length) % 2 == 0)
+                    return (expression.ToString(), true);
+                else
+                    throw new ArgumentException("Функция задана неверно!");
+            }
+            else
+            {
+                //реализовать проверку для обычной функции
+                return (expression.ToString(), false);
+            }
+
         }
+
+        #region Информация, выводимая в ResultPanel
+
+        //сднф
+        private string sdnfExpression;
+        public string SdnfExpression { get => sdnfExpression; set
+            {
+                sdnfExpression = value;
+                OnPropertyChanged();
+            } }
+
+        //скнф
+        private string sknfExpression;
+        public string SknfExpression { get => sknfExpression; set
+            {
+                sknfExpression = value;
+                OnPropertyChanged(); } }
 
         //содержит таблицу значений функции для вывода на экран
         private DataView dataViewValueTable;
@@ -84,6 +142,7 @@ namespace TruthTable.ViewModel
                 dataViewValueTable = value;
                 OnPropertyChanged(nameof(DataViewValueTable));
             } }
+        #endregion
 
         //заполняет таблицу значений
         private void FillDataGridValueTable()
@@ -153,6 +212,22 @@ namespace TruthTable.ViewModel
         public bool IsBuildValueTable { get { return isBuildValueTable; } set
             {
                 isBuildValueTable = value;
+                OnPropertyChanged();
+            } }
+
+        //построение СДНФ
+        private bool isBuildSdnf;
+        public bool IsBuildSdnf { get => isBuildSdnf; set
+            {
+                isBuildSdnf = value;
+                OnPropertyChanged();
+            } }
+
+        //построение СКНФ
+        private bool isBuildSknf;
+        public bool IsBuildSknf { get => isBuildSknf; set
+            {
+                isBuildSknf = value;
                 OnPropertyChanged();
             } }
         #endregion

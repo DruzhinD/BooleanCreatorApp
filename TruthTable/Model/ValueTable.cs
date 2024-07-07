@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TruthTable.Model.NormalForms;
 
 namespace TruthTable.Model
 {
@@ -13,6 +14,11 @@ namespace TruthTable.Model
     public class ValueTable
     {
         LogicalFunction function; //логическая функция
+        
+        /// <summary>
+        /// Логическая функция
+        /// </summary>
+        public string Expression { get => function.InFix; }
 
         public ArgValuePair this[int i]
         {
@@ -25,6 +31,7 @@ namespace TruthTable.Model
         /// </summary>
         public int AmountOfVariables { get => function.variables.Length; }
 
+        //максимальное числовое значение в десятичной системе, построенное из набора переменных = 1
         public int MaxDecimalValue { get => (int)Math.Pow(2, AmountOfVariables); }
 
         /// <summary>
@@ -39,10 +46,11 @@ namespace TruthTable.Model
             CreateTable();
         }
 
-        //генерация таблицы значений
+        ///генерация таблицы значений <summary>
+        /// </summary>
         private void CreateTable()
-        {
-            int maxValue = (int)Math.Pow(2, AmountOfVariables); //макс значение в десятичной системе
+        { 
+            int maxValue = MaxDecimalValue; //макс значение в десятичной системе
 
             for (int i = 0; i < maxValue; i++)
             {
@@ -52,22 +60,56 @@ namespace TruthTable.Model
             }
         }
 
-        //public ValueTable(string vectorFunction)
-        //{
-        //    CreateTable(vectorFunction);
-        //}
-
-        //private void CreateTable(string vectorFunction)
-        //{
-        //    int maxValue = vectorFunction.Length;
-        //}
-
-        //преобразование десятичного числа в двоичное в виде массива битов
-        private byte[] ConvertToBinaryArray(int number, int digits)
+        ///<summary>создание таблицы значений на основе вектор-функции 
+        /// </summary>
+        /// <param name="vectorFunction"></param>
+        public ValueTable(string vectorFunction)
         {
-            byte[] binaryArray = new byte[digits];
+            CreateTable(vectorFunction);
+            LogicNormalForm = new SDNF();
+            this.function = new LogicalFunction(GetNormalForm());
+        }
 
-            //число, переведенное в двоичную систему с количеством разрядов <= digits
+        private void CreateTable(string vectorFunction)
+        {
+            int maxValue = vectorFunction.Length;
+            //получаем количество переменных
+            int amountVariables = (int)Math.Log(maxValue, 2);
+
+            //преобразуем строку 0 и 1 в массив 0 и 1
+            byte[] bytes = vectorFunction.ToCharArray().Select(c => (byte)(c - '0')).ToArray();
+            table = new ArgValuePair[maxValue];
+            //заполняем таблицу значений
+            for (int i = 0; i < maxValue; i++)
+            {
+                byte[] args = ConvertToBinaryArray(i, amountVariables);
+                table[i] = new ArgValuePair(args, bytes[i]);
+            }
+        }
+
+        ///<summary>
+        /// алгоритм, применяющийся к логической функции, чтобы получить конкретную форму логической функции,
+        /// </summary>
+        //например, СДНФ, МДНФ и т.п.
+        public INormalizationForm LogicNormalForm { get; set; }
+
+        //метод для генерации нормальной формы
+        public string GetNormalForm()
+        {
+            return LogicNormalForm.GetNormalForm(this.table);
+        }
+
+        /// <summary>
+        /// преобразование десятичного числа в двоичное в виде массива битов
+        /// </summary>
+        /// <param name="number">число, которое необходимо получить в двоичном виде</param>
+        /// <param name="amountVariables">количество переменных, т.е. количество разрядов у числа на выходе</param>
+        /// <returns></returns>
+        private byte[] ConvertToBinaryArray(int number, int amountVariables)
+        {
+            byte[] binaryArray = new byte[amountVariables];
+
+            //число, переведенное в двоичную систему с количеством разрядов <= amountVariables
             char[] binary = Convert.ToString(number, 2).ToCharArray();
 
             //количество разрядов, которых не хватает в массиве символов
